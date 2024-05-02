@@ -143,23 +143,28 @@ def GetMean(values):
 Implement a function that returns the covariance matrix of multiple samples (Nx2)
 """ 
 def GetCov(values):
-    mean = GetMean(values)
-    var_x = var_y = cov_x_y = 0
-    for value in values:
-        var_x += pow(value[0] - mean[0], 2)
-        var_y += pow(value[1] - mean[1], 2)
-        cov_x_y += (value[0] - mean[0]) * (value[1] - mean[1])
-    var_x = var_x / len(values)
-    var_y = var_y / len(values)
-    cov_x_y = cov_x_y / len(values)
-    matrix = np.matrix([[var_x, cov_x_y], [cov_x_y, var_y]])
-    return matrix
+    """
+        mean = GetMean(values)
+        var_x = var_y = cov_x_y = 0
+        for value in values:
+            var_x += pow(value[0] - mean[0], 2)
+            var_y += pow(value[1] - mean[1], 2)
+            cov_x_y += (value[0] - mean[0]) * (value[1] - mean[1])
+        var_x = var_x / len(values)
+        var_y = var_y / len(values)
+        cov_x_y = cov_x_y / len(values)
+        matrix = np.matrix([[var_x, cov_x_y], [cov_x_y, var_y]])
+    """
+
+    result = np.cov(values.T)
+    return result
 
 """
 Implement a function that returns a 2x2 rotation matrix for a given angle
 """ 
 def GetRotationMatrix(angle):
-    raise NotImplementedError
+    rot = np.array([[np.cos(angle), -np.sin(angle)],[np.sin(angle), np.cos(angle)]])
+    return rot
 
 
 
@@ -167,31 +172,42 @@ def GetRotationMatrix(angle):
 Implement a function that returns a 3x3  homogeneous transformation matrix  for a given angle and translation tx,ty
 """ 
 def GetHomTransformMatrix(angle,tx,ty):
-    raise NotImplementedError
+    transformation_mat = np.array([[np.cos(angle), -np.sin(angle), tx],[np.sin(angle), np.cos(angle), ty], [0,0,1]])
+    return transformation_mat
 
 
 """
 Implement a function for transforming all input points with the homogeneous transformation matrix 
 """ 
 def ApplyTransformToPoints(mat, points):
-    raise NotImplementedError
+    transformed_points = np.zeros(shape=(np.shape(points)))
+    for i in range(0,np.shape(points)[0]):
+        point = points[i,:]
+        point = np.append(point, 1)
+        transformed_point = mat@point
+        transformed_points[i,:] = transformed_point[:2]
+    return transformed_points
 
 """
 Implement the multivariate probability density function 
 """ 
 def GetProb(x, mean, cov):
-    determinant = np.linalg.det(cov)
-    cov_inverse = np.linalg.inv(cov)
-    z = pow(2 * math.pi, 3/2) * pow(determinant, 0.5)
-    print(f"mean {mean}")
-    print(numpy.transpose(mean.T))
-    print(cov_inverse)
-    print((x - mean))
+    """
+        determinant = np.linalg.det(cov)
+        cov_inverse = np.linalg.inv(cov)
+        z = pow(2 * math.pi, 3/2) * pow(determinant, 0.5)
+        print(f"mean {mean}")
+        print(numpy.transpose(mean.T))
+        print(cov_inverse)
+        print((x - mean))
 
-    exp = -0.5 * (x - mean) * cov_inverse * numpy.transpose(x - mean)
-    pdf = 1 / z * numpy.exp(exp)
-    return pdf
-
+        exponent = -0.5 * (x - mean) * cov_inverse * numpy.transpose(x - mean)
+        pdf = 1 / z * numpy.exp(exponent)
+        return pdf
+    """
+    #2-dim Multivariate Distribution
+    prob_density = 1 / (2*np.pi*np.linalg.det(cov)**(0.5)) * np.exp(-0.5 * (x-mean) @ np.linalg.inv(cov) @ (x-mean))
+    return prob_density
 
 """
 
