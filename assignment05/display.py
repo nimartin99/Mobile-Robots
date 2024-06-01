@@ -18,7 +18,7 @@ if __name__ == "__main__":
             
             x = distance * math.cos(azimuth) * math.cos(tilt)
             y = distance * math.sin(azimuth) * math.cos(tilt)
-            z = distance * math.cos(tilt)
+            z = distance * math.sin(tilt)
             points.append([x, y, z])
 
     pcd= o3d.geometry.PointCloud()
